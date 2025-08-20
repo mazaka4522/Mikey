@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mikey Workshop</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #0c0014;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    header {
+      text-align: center;
+      margin: 0;
+      z-index: 10;
+      position: relative;
+    }
+    #artistTitle {
+      font-family: 'Wedges', sans-serif;
+      font-size: clamp(36px, 6vw, 90px);
+      color: #d09aff;
+      text-shadow: 0 0 10px #d09aff, 0 0 20px #e6bfff, 0 0 40px #f2d9ff;
+      margin: 0;
+      padding: 15px 0;
+    }
+
+    .workshop-section {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+      padding: 20px;
+      z-index: 10;
+      position: relative;
+    }
+
+    /* Левая колонка */
+    .workshop-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 350px;
+    }
+    .pfp {
+      width: 100%;
+      height: 400px;
+      object-fit: contain;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: transform 0.3s;
+      z-index: 10;
+      position: relative;
+    }
+    .pfp:hover {
+      transform: scale(1.02);
+      filter: drop-shadow(0 0 8px #d09aff);
+    }
+    .socials {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 10px;
+    }
+    .socials img {
+      width: 50px;
+      cursor: pointer;
+      transition: transform 0.3s, filter 0.3s;
+    }
+    .socials img:hover {
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 8px #d09aff);
+    }
+
+    /* Крутящийся тикет */
+    .ticket-spin {
+      animation: spin 4s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* Центр (MIKEY) */
+    #mikeyName {
+      font-family: 'Wedges', sans-serif;
+      font-size: clamp(32px, 5vw, 80px);
+      color: #d09aff;
+      text-shadow: 0 0 10px #d09aff, 0 0 20px #e6bfff, 0 0 40px #f2d9ff;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 400px;
+    }
+
+    /* Правая колонка */
+    .workshop-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 350px;
+      max-width: 350px; /* ограничиваем ширину */
+    }
+    .slider {
+      width: 100%;
+      height: 400px;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #1a0025;
+    }
+    .slides {
+      display: flex;
+      transition: transform 0.5s ease;
+      height: 100%;
+    }
+    .slide {
+      flex: 0 0 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .slide img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 16px;
+    }
+
+    .monad-link {
+      font-family: 'Wedges', sans-serif;
+      color: #d09aff;
+      text-shadow: 0 0 10px #d09aff, 0 0 20px #e6bfff, 0 0 40px #f2d9ff;
+      margin-top: 10px;
+    }
+    .monad-link a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .monad-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* --------- Модальное окно --------- */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #1a0025;
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      gap: 20px;
+      max-width: 800px;
+      color: #fff;
+      text-align: left;
+      box-shadow: 0 0 20px #d09aff;
+      position: relative;
+    }
+    .modal-text {
+      flex: 2;
+      font-size: 18px;
+      line-height: 1.5;
+    }
+    .modal-image {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-image img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .close-btn:hover {
+      color: #d09aff;
+    }
+
+    /* Летающие монстры */
+    .sprite {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      pointer-events: none;
+      opacity: 1;
+      z-index: 1;
+      animation: fly 8s linear forwards;
+    }
+
+    /* Кляксы */
+    .splat {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.8;
+      transform: scale(0.5);
+      animation: splatFade 1.5s ease-out forwards;
+      z-index: 0;
+    }
+
+    @keyframes fly {
+      from { transform: translate3d(var(--xStart), var(--yStart), 0) rotate(0deg); }
+      to   { transform: translate3d(var(--xEnd), var(--yEnd), 0) rotate(360deg); }
+    }
+
+    @keyframes splatFade {
+      0%   { opacity: 0.9; transform: scale(0.5); }
+      50%  { opacity: 0.6; transform: scale(1.2); }
+      100% { opacity: 0; transform: scale(2); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="artistTitle">Jumapel Artist</h1>
+  </header>
+
+  <main class="workshop-section">
+    <!-- Левая колонка -->
+    <div class="workshop-left">
+      <img src="pfp_mikey.png" alt="Mikey" class="pfp" id="pfpImage"/>
+      <div class="socials">
+        <a href="https://x.com/Mikey_Muffalo" target="_blank">
+          <img src="twitter.png" alt="Twitter Mikey" />
+        </a>
+        <a href="https://x.com/Jumapelnads" target="_blank">
+          <img src="beret.png" alt="Twitter Jumapel" />
+        </a>
+        <a href="https://mazaka4522.github.io/Jumapel/" target="_blank">
+          <img src="tiket.png" alt="Tiket" class="ticket-spin"/>
+        </a>
+      </div>
+    </div>
+
+    <!-- Центр -->
+    <div id="mikeyName">MIKEY</div>
+
+    <!-- Правая колонка -->
+    <div class="workshop-right">
+      <div class="slider">
+        <div class="slides">
+          <div class="slide"><img src="1.png" alt=""></div>
+          <div class="slide"><img src="2.png" alt=""></div>
+          <div class="slide"><img src="3.png" alt=""></div>
+          <div class="slide"><img src="4.png" alt=""></div>
+          <div class="slide"><img src="5.png" alt=""></div>
+          <div class="slide"><img src="6.png" alt=""></div>
+          <div class="slide"><img src="7.png" alt=""></div>
+          <div class="slide"><img src="8.png" alt=""></div>
+        </div>
+      </div>
+      <div class="monad-link">
+        <a href="https://twitter.com/monad_xyz" target="_blank">Build on Monad</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Модальное окно -->
+  <div class="modal" id="artistModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeModal">&times;</span>
+      <div class="modal-text">
+        <h2>Mikey the Artist</h2>
+        <p>
+          Mikey is a professional artist with his own unique style and personal workshop.  
+          He is recognized as one of the best Monartists in Monad and the creator of the NFT collection <b>Jumapel</b>.
+        </p>
+      </div>
+      <div class="modal-image">
+        <img src="game8.png" alt="Game Animation">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Автопрокрутка слайдов
+    const slides = document.querySelector('.slides');
+    const slideCount = document.querySelectorAll('.slide').length;
+    let currentIndex = 0;
+
+    function showNextSlide() {
+      currentIndex = (currentIndex + 1) % slideCount;
+      slides.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+    setInterval(showNextSlide, 3000);
+
+    // Модальное окно
+    const modal = document.getElementById("artistModal");
+    const pfpImage = document.getElementById("pfpImage");
+    const closeModal = document.getElementById("closeModal");
+
+    pfpImage.onclick = () => { modal.style.display = "flex"; };
+    closeModal.onclick = () => { modal.style.display = "none"; };
+    window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
+
+    // Летающие монстры с кляксами
+    const sprites = ["game6.png", "game7.png", "game8.png"];
+    const splatColors = ["#ff3b30", "#ffcc00", "#4cd964", "#5ac8fa", "#d09aff", "#ff2d55"];
+
+    function createSprite() {
+      const sprite = document.createElement("img");
+      sprite.src = sprites[Math.floor(Math.random() * sprites.length)];
+      sprite.className = "sprite";
+
+      const startX = Math.random() * window.innerWidth;
+      const startY = Math.random() * window.innerHeight;
+      const endX = Math.random() * window.innerWidth;
+      const endY = Math.random() * window.innerHeight;
+
+      sprite.style.setProperty("--xStart", `${startX}px`);
+      sprite.style.setProperty("--yStart", `${startY}px`);
+      sprite.style.setProperty("--xEnd", `${endX}px`);
+      sprite.style.setProperty("--yEnd", `${endY}px`);
+
+      document.body.appendChild(sprite);
+
+      const trail = setInterval(() => {
+        const rect = sprite.getBoundingClientRect();
+        const splat = document.createElement("div");
+        splat.className = "splat";
+        splat.style.left = rect.left + rect.width / 2 + "px";
+        splat.style.top = rect.top + rect.height / 2 + "px";
+        splat.style.background = splatColors[Math.floor(Math.random() * splatColors.length)];
+
+        document.body.appendChild(splat);
+        setTimeout(() => splat.remove(), 1500);
+      }, 200);
+
+      setTimeout(() => {
+        clearInterval(trail);
+        sprite.remove();
+      }, 8000);
+    }
+
+    setInterval(createSprite, 800);
+  </script>
+</body>
+</html>
